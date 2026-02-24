@@ -18,6 +18,30 @@ public class FileCabinet implements Cabinet {
 
     @Override
     public int count() {
-        return 0;
+        int counter = 0;
+
+        for (int i = 0; i < folders.size(); i++) {
+            counter++;
+            Folder folder = folders.get(i);
+            if ( folder instanceof MultiFolder ) {
+                List<Folder> children = ((MultiFolder) folder).getFolders();
+
+                for ( int j = 0; j < children.size(); j++) {
+                    counter++;
+                    if ( children.get(j) instanceof MultiFolder) {
+                        List<Folder> children2 = ((MultiFolder) children.get(j)).getFolders();
+
+                        for ( int k = 0; k < children2.size(); k++) {
+                            counter++;
+
+                            // ...
+                        }
+                    }
+                }
+
+            }
+        }
+
+        return counter;
     }
 }
