@@ -24,7 +24,20 @@ public class FileCabinet implements Cabinet {
 
     @Override
     public Optional<Folder> findFolderByName(String name) {
-        return Optional.empty();
+        Folder[] found = new Folder[1];
+
+        walkFolders(folders, folder -> {
+            if (found[0] == null && folder.getName().equals(name)) {
+                found[0] = folder;
+            }
+        });
+
+//        if (found[0] != null) {
+//            return Optional.of(found[0]);
+//        } else {
+//            return Optional.empty();
+//        }
+        return Optional.ofNullable(found[0]);
     }
 
     @Override
