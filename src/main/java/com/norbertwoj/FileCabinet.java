@@ -1,5 +1,6 @@
 package com.norbertwoj;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -42,7 +43,15 @@ public class FileCabinet implements Cabinet {
 
     @Override
     public List<Folder> findFoldersBySize(String size) {
-        return List.of();
+        List<Folder> result = new ArrayList<>();
+
+        walkFolders(folders, folder -> {
+            if (folder.getSize().equals(size)) {
+                result.add(folder);
+            }
+        });
+
+        return result;
     }
 
     @Override
