@@ -2,9 +2,25 @@ package com.norbertwoj;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 public class FileCabinet implements Cabinet {
     private List<Folder> folders;
+
+    public FileCabinet(List<Folder> folders) {
+        this.folders = List.copyOf(folders);
+    }
+
+    private void walkFolders(List<Folder> folders, Consumer<Folder> consumer) {
+        for (Folder folder : folders) {
+             consumer.accept(folder);
+             if (folder instanceof MultiFolder) {
+                 List<Folder> children = ((MultiFolder) folder).getFolders();
+                 walkFolders(children, consumer);
+             }
+        }
+    }
 
     @Override
     public Optional<Folder> findFolderByName(String name) {
@@ -18,30 +34,10 @@ public class FileCabinet implements Cabinet {
 
     @Override
     public int count() {
-        int counter = 0;
+        AtomicInteger counter = new AtomicInteger();
 
-        for (int i = 0; i < folders.size(); i++) {
-            counter++;
-            Folder folder = folders.get(i);
-            if ( folder instanceof MultiFolder ) {
-                List<Folder> children = ((MultiFolder) folder).getFolders();
+        walkFolders(folders, folder -> counter.incrementAndGet());
 
-                for ( int j = 0; j < children.size(); j++) {
-                    counter++;
-                    if ( children.get(j) instanceof MultiFolder) {
-                        List<Folder> children2 = ((MultiFolder) children.get(j)).getFolders();
-
-                        for ( int k = 0; k < children2.size(); k++) {
-                            counter++;
-
-                            // ...
-                        }
-                    }
-                }
-
-            }
-        }
-
-        return counter;
+        return counter.get();
     }
 }
