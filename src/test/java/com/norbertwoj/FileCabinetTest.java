@@ -7,6 +7,31 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FileCabinetTest {
+    private FileCabinet createFiveLevelsStructure() {
+        Folder folder10 = new FolderImpl("Folder10", "SMALL");
+        Folder folder9 = new FolderImpl("Folder9", "LARGE");
+        MultiFolder level5 = new MultiFolderImpl("Level5", "SMALL", List.of(folder9, folder10));
+
+        Folder folder8 = new FolderImpl("Folder8", "MEDIUM");
+        Folder folder7 = new FolderImpl("Folder7", "SMALL");
+        MultiFolder level4 = new MultiFolderImpl("Level4", "MEDIUM", List.of(level5, folder7, folder8));
+
+        Folder folder6 = new FolderImpl("Folder6", "LARGE");
+        Folder folder5 = new FolderImpl("Folder5", "MEDIUM");
+        MultiFolder level3 = new MultiFolderImpl("Level3", "MEDIUM", List.of(level4, folder5, folder6));
+
+        Folder folder4 = new FolderImpl("Folder4", "SMALL");
+        Folder folder3 = new FolderImpl("Folder3", "LARGE");
+        MultiFolder level2 = new MultiFolderImpl("Level2", "LARGE", List.of(level3, folder3, folder4));
+
+        Folder folder2 = new FolderImpl("Folder2", "MEDIUM");
+        Folder folder1 = new FolderImpl("Folder1", "LARGE");
+        MultiFolder level1 = new MultiFolderImpl("Level1", "LARGE", List.of(level2, folder1, folder2));
+
+        Folder folder0 = new FolderImpl("Folder0", "SMALL");
+        return new FileCabinet(List.of(level1, folder0));
+    }
+
 
     @Test
     void shouldCountEmptyMultiFolder() {
@@ -38,30 +63,8 @@ class FileCabinetTest {
 
     @Test
     void shouldCountFiveLevelsStructureWithMultiFoldersAndFolders() {
-        Folder folder10 = new FolderImpl("Folder10", "SMALL");
-        Folder folder9 = new FolderImpl("Folder9", "LARGE");
-        MultiFolder level5 = new MultiFolderImpl("Level5", "SMALL", List.of(folder9, folder10));
 
-        Folder folder8 = new FolderImpl("Folder8", "MEDIUM");
-        Folder folder7 = new FolderImpl("Folder7", "SMALL");
-        MultiFolder level4 = new MultiFolderImpl("Level4", "MEDIUM", List.of(level5, folder7, folder8));
-
-        Folder folder6 = new FolderImpl("Folder6", "LARGE");
-        Folder folder5 = new FolderImpl("Folder5", "MEDIUM");
-        MultiFolder level3 = new MultiFolderImpl("Level3", "MEDIUM", List.of(level4, folder5, folder6));
-
-        Folder folder4 = new FolderImpl("Folder4", "SMALL");
-        Folder folder3 = new FolderImpl("Folder3", "LARGE");
-        MultiFolder level2 = new MultiFolderImpl("Level2", "LARGE", List.of(level3, folder3, folder4));
-
-        Folder folder2 = new FolderImpl("Folder2", "MEDIUM");
-        Folder folder1 = new FolderImpl("Folder1", "LARGE");
-        MultiFolder level1 = new MultiFolderImpl("Level1", "LARGE", List.of(level2, folder1, folder2));
-
-        Folder folder0 = new FolderImpl("Folder0", "SMALL");
-        FileCabinet cabinet = new FileCabinet(List.of(level1, folder0));
-
-        int result = cabinet.count();
+        int result = createFiveLevelsStructure().count();
 
         assertEquals(16, result);
     }
@@ -76,5 +79,27 @@ class FileCabinetTest {
         assertTrue(cabinet.findFolderByName("AnyName").isEmpty());
 
         assertEquals(0, cabinet.findFoldersBySize("SMALL").size());
+    }
+
+    @Test
+    void shouldFindFolderByName() {
+        FileCabinet cabinet = createFiveLevelsStructure();
+
+        assertTrue(cabinet.findFolderByName("Folder0").isPresent());
+        assertTrue(cabinet.findFolderByName("Level1").isPresent());
+
+        assertEquals("Folder0", cabinet.findFolderByName("Folder0").get().getName());
+        assertEquals("Level1", cabinet.findFolderByName("Level1").get().getName());
+
+        assertTrue(cabinet.findFolderByName("Empty").isEmpty());
+    }
+
+    @Test
+    void shouldReturnEmptyForEmptyCabinet() {
+        FileCabinet cabinet = new FileCabinet(List.of());
+
+        assertTrue(cabinet.findFolderByName("Folder1").isEmpty());
+        assertTrue(cabinet.findFolderByName("Level1").isEmpty());
+        assertTrue(cabinet.findFolderByName("NonExisting").isEmpty());
     }
 }
