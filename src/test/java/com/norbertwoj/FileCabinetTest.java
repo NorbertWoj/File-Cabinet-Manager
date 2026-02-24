@@ -102,4 +102,68 @@ class FileCabinetTest {
         assertTrue(cabinet.findFolderByName("Level1").isEmpty());
         assertTrue(cabinet.findFolderByName("NonExisting").isEmpty());
     }
+
+    @Test
+    void shouldFindFoldersBySizeSmall() {
+        FileCabinet cabinet = createFiveLevelsStructure();
+
+        List<Folder> smallFolders = cabinet.findFoldersBySize("SMALL");
+
+        assertEquals(5, smallFolders.size());
+
+        assertTrue(smallFolders.stream().anyMatch(f -> f.getName().equals("Folder0")));
+        assertTrue(smallFolders.stream().anyMatch(f -> f.getName().equals("Folder4")));
+        assertTrue(smallFolders.stream().anyMatch(f -> f.getName().equals("Folder7")));
+        assertTrue(smallFolders.stream().anyMatch(f -> f.getName().equals("Folder10")));
+        assertTrue(smallFolders.stream().anyMatch(f -> f.getName().equals("Level5")));
+    }
+
+    @Test
+    void shouldFindFoldersBySizeMedium() {
+        FileCabinet cabinet = createFiveLevelsStructure();
+
+        List<Folder> mediumFolders = cabinet.findFoldersBySize("MEDIUM");
+
+        assertEquals(5, mediumFolders.size());
+
+        assertTrue(mediumFolders.stream().anyMatch(f -> f.getName().equals("Folder2")));
+        assertTrue(mediumFolders.stream().anyMatch(f -> f.getName().equals("Folder5")));
+        assertTrue(mediumFolders.stream().anyMatch(f -> f.getName().equals("Folder8")));
+        assertTrue(mediumFolders.stream().anyMatch(f -> f.getName().equals("Level3")));
+        assertTrue(mediumFolders.stream().anyMatch(f -> f.getName().equals("Level4")));
+    }
+
+    @Test
+    void shouldFindFoldersBySizeLarge() {
+        FileCabinet cabinet = createFiveLevelsStructure();
+
+        List<Folder> largeFolders = cabinet.findFoldersBySize("LARGE");
+
+        assertEquals(6, largeFolders.size());
+
+        assertTrue(largeFolders.stream().anyMatch(f -> f.getName().equals("Folder1")));
+        assertTrue(largeFolders.stream().anyMatch(f -> f.getName().equals("Folder3")));
+        assertTrue(largeFolders.stream().anyMatch(f -> f.getName().equals("Folder6")));
+        assertTrue(largeFolders.stream().anyMatch(f -> f.getName().equals("Folder9")));
+        assertTrue(largeFolders.stream().anyMatch(f -> f.getName().equals("Level1")));
+        assertTrue(largeFolders.stream().anyMatch(f -> f.getName().equals("Level2")));
+    }
+
+    @Test
+    void shouldReturnEmptyForNonExistingSize() {
+        FileCabinet cabinet = createFiveLevelsStructure();
+
+        List<Folder> tinyFolders = cabinet.findFoldersBySize("TINY");
+
+        assertTrue(tinyFolders.isEmpty());
+    }
+
+    @Test
+    void shouldReturnEmptyForEmptyCabinetSizeQuery() {
+        FileCabinet cabinet = new FileCabinet(List.of());
+
+        List<Folder> result = cabinet.findFoldersBySize("SMALL");
+
+        assertTrue(result.isEmpty());
+    }
 }
